@@ -8,7 +8,7 @@
 
 ### App Walk-though
 
-<img src="https://recordit.co/LSMccFWOfc" width=200><br>
+<img src="https://raw.githubusercontent.com/Tnkata/Calendar_app/main/Screen%20Shot%202021-03-05%20at%201.00.44%20AM.png" width=200><br>
 
 
 
