@@ -40,6 +40,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   Map<DateTime, List> _events;
+  TextEditingController _eventController;
   List _selectedEvents;
   AnimationController _animationController;
   CalendarController _calendarController;
@@ -47,7 +48,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _eventController = TextEditingController();
     final _selectedDay = DateTime.now();
+
 
     _events = {
       _selectedDay.subtract(Duration(days: 30)): [
@@ -142,6 +145,39 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.clear),
+          onPressed: () => Navigator.pop(context),
+          ),
+          //Update. Code to delete a class, by Tim.
+          actions: [
+            IconButton(
+              icon: Icon(Icons.delete), 
+              onPressed: () async{
+                final confirm = await showDialog(
+                  context: context,
+                  builder: (copntext) => AlertDialog(
+                    title: Text("Warning"),
+                    content: Text("Are you sure?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: Text("Delete"),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text("Cancel", style: TextStyle(color: Colors.grey.shade700),),
+                      ),
+                    ],
+                  ),
+                ) ?? false;
+                if(confirm){
+                  //pop and delete the event
+                  Navigator.pop(context);
+                }
+              },
+            )
+          ],
         title: Text(widget.title),
       ),
       body: Column(
@@ -149,7 +185,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         children: <Widget>[
           // Switch out 2 lines below to play with TableCalendar's settings
           //-----------------------
-          _buildTableCalendar(),
+          _buildTableCalendar(
+          ),
           // _buildTableCalendarWithBuilders(),
           const SizedBox(height: 8.0),
           _buildButtons(),
@@ -157,11 +194,43 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           Expanded(child: _buildEventList()),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: _showAddDialog,
+      )
     );
   }
+//Recent update to add a class. By Timothy N.
+_showAddDialog() {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      content: TextField(
+        controller: _eventController,
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text("Save"),
+          onPressed: (){
+            if(_eventController.text.isEmpty) return;
+            setState(() {
+              if(_events[_calendarController.selectedDay] != null){
+              _events[_calendarController.selectedDay].add(_eventController.text);
+            } else {
+              _events[_calendarController.selectedDay] = [_eventController.text];
+            }
+            _eventController.clear();
+            Navigator.pop(context);
+            });
+          },
+        )
+      ],
+    )
+  );
+}
 
   // Simple TableCalendar configuration (using Styles)
-  Widget _buildTableCalendar() {
+  Widget _buildTableCalendar({Map<DateTime, List> events}) {
     return TableCalendar(
       calendarController: _calendarController,
       events: _events,
@@ -303,6 +372,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       ),
     );
   }
+
 
   Widget _buildHolidaysMarker() {
     return Icon(
