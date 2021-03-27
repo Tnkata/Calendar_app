@@ -29,6 +29,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -42,6 +44,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   Map<DateTime, List> _events;
   TextEditingController _eventController;
   List _selectedEvents;
+  DateTime _datetime;
   AnimationController _animationController;
   CalendarController _calendarController;
 
@@ -143,6 +146,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -151,32 +155,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           ),
           //Update. Code to delete a class, by Tim.
           actions: [
-            IconButton(
-              icon: Icon(Icons.delete), 
-              onPressed: () async{
-                final confirm = await showDialog(
-                  context: context,
-                  builder: (copntext) => AlertDialog(
-                    title: Text("Warning"),
-                    content: Text("Are you sure?"),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: Text("Delete"),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: Text("Cancel", style: TextStyle(color: Colors.grey.shade700),),
-                      ),
-                    ],
-                  ),
-                ) ?? false;
-                if(confirm){
-                  //pop and delete the event
-                  Navigator.pop(context);
-                }
-              },
-            )
           ],
         title: Text(widget.title),
       ),
@@ -192,6 +170,25 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           _buildButtons(),
           const SizedBox(height: 8.0),
           Expanded(child: _buildEventList()),
+
+          // DateTime picker update done by Tim
+          Text(_datetime == null? 'Nothing has been picked yet ': _datetime.toString()),
+          RaisedButton(
+            child: Text('Pick a date'),
+            onPressed: () {
+              showDatePicker(
+                context: context, 
+                initialDate: DateTime.now(), 
+                firstDate: DateTime(2021), 
+                lastDate: DateTime(2222)
+              ).then((date) {
+                setState(() {
+                  _datetime = date;
+                });
+              });
+            },
+          )
+
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -228,6 +225,8 @@ _showAddDialog() {
     )
   );
 }
+
+
 
   // Simple TableCalendar configuration (using Styles)
   Widget _buildTableCalendar({Map<DateTime, List> events}) {
@@ -445,7 +444,36 @@ _showAddDialog() {
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 child: ListTile(
                   title: Text(event.toString()),
-                  onTap: () => print('$event tapped!'),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () async {
+                      final confirm = await showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text("Warning"),
+                          content: Text("Are you sure you wan to delete this class?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedEvents.removeAt(_selectedEvents.indexOf('$event'));
+                                });
+                                Navigator.pop(context, false);
+                              },
+                              child: Text("Delete"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: Text("Cancel", style: TextStyle(color: Colors.grey.shade700),),
+                            ),
+                          ],
+                        ),
+                      ) ?? false;
+                      if(confirm){
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
                 ),
               ))
           .toList(),
