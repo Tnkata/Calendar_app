@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/add_event.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart';
+
+
+//import 'dart:async';
+//import 'package:firebase_core/firebase_core.dart';
+//import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+//import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 //Holidays for later use:
 final Map<DateTime, List> _holidays = {
@@ -16,6 +23,7 @@ void main() {
   initializeDateFormatting().then((_) => runApp(MyApp()));
 }
 
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -24,11 +32,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Student Calendar View'),
+      home: MyHomePage(
+        title: 'Student Calendar View'
+        
+      ),
+      routes: {
+        "add_event" :(_) => AddEventPage(),
+      },
     );
   }
 }
-
 
 
 class MyHomePage extends StatefulWidget {
@@ -40,7 +53,10 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+
+
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+
   Map<DateTime, List> _events;
   TextEditingController _eventController;
   List _selectedEvents;
@@ -159,6 +175,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         title: Text(widget.title),
       ),
       body: Column(
+        
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           // Switch out 2 lines below to play with TableCalendar's settings
@@ -188,17 +205,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               });
             },
           )
-
         ],
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: _showAddDialog,
+        onPressed: () => Navigator.pushNamed(context, 'add_event'),
       )
     );
   }
+
+
+  
+
 //Recent update to add a class. By Timothy N.
-_showAddDialog() {
+/*_showAddDialog() {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -224,7 +244,10 @@ _showAddDialog() {
       ],
     )
   );
-}
+}*/
+
+
+
 
 
 
@@ -480,3 +503,4 @@ _showAddDialog() {
     );
   }
 }
+
